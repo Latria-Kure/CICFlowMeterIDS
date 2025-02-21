@@ -13,7 +13,7 @@ CICFlowMeter 被广泛应用于包括 CICIDS2017 在内的多个网络安全数�
 - **bulk检测问题**：所有带payload的packet都被记为backward bulk，导致所有forward bulk相关的特征均为0，backward bulk特征的值也都是错误的。
 
 ### 项目目标
-虽然最新版本的 CICFlowMeter 已修复这些问题，但由于将 RST 标志纳入考虑，改变了流量测量方法。这导致相同的 pcap 文件会产生不同数量的流（如 CICIDS2017 的 690K 流变为 770K 流）。
+虽然最新版本的 CICFlowMeter 已修复这些问题，但由于流量测量方法改变了，这导致相同的 pcap 文件会产生不同数量的FLow（如 CICIDS2017 的一个数据集的 690K FLows变为 770K Flows）。
 
 本项目旨在：
 - **修复关键Bug同时保持流兼容性**：生成与CICIDS2017相同数量的流，但具有正确的特征。可以将两个数据集相匹配，从而修复IDS2017的错误特征
@@ -135,4 +135,36 @@ gradlew execute    # Windows
 ```java
 // gradle/wrapper/gradle-wrapper.properties
 distributionUrl=https://mirrors.huaweicloud.com/gradle/gradle-4.2-all.zip
+```
+
+## 数据匹配
+### 与原始CICIDS2017数据集匹配
+以下是一个Python脚本示例，演示如何将本项目生成的新数据集与原始CICIDS2017数据集中的流量进行匹配。这使得我们可以将原始数据集中的标签转移到具有正确特征的新数据集中。
+
+```python
+import pandas as pd
+import numpy as np
+
+# 注意：运行此脚本前请确保两个数据集的特征名称一致
+def encode_flow_hash(row):
+    return hash((row['Src IP'], row['Src Port'], row['Dst IP'], row['Dst Port'], row['Protocol'],row['Flow Duration'],row['Total Fwd Packet'],row['Total Bwd packets']))
+
+# 原始IDS2017数据集
+old_data = pd.read_csv("data/output_csv_files/old.csv",)
+# 使用相同pcap文件由本项目生成的数据集
+new_data = pd.read_csv("data/output_csv_files/new.csv",)
+
+old_data['Flow Hash'] = old_data.apply(encode_flow_data, axis=1)
+new_data['Flow Hash'] = new_data.apply(encode_flow_data, axis=1)
+
+old_hash_label ={}
+
+# 注意：虽然Flow hash不能保证唯一性，
+# 但具有相同hash的flow通常具有相同的label。
+# 在极少数哈希冲突导致label不同的情况下，
+# 需要用户根据需求自行处理
+for idx, row in old_data.iterrows():
+    old_hash_label[row['Flow Hash']] = row['Label']
+
+new_data['Label'] = new_data['Flow Hash'].map(old_hash_label)
 ```
