@@ -47,6 +47,7 @@ CICFlowMeter.bat  # Windows
 ./cfm <输入pcap文件> <输出文件夹>     # Linux
 cfm.bat <输入pcap文件> <输出文件夹>   # Windows
 ```
+> 注：无论是GUI还是命令行模式，输入输出文件路径都不可携带中文。
 
 ## 从源码构建
 
