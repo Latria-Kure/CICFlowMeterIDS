@@ -377,7 +377,7 @@ public class BasicFlow {
 
 	public void updateFlowBulk (BasicPacketInfo packet){
 
-		if(this.src == packet.getSrc()){
+		if(Arrays.equals(this.src, packet.getSrc())){
 			updateForwardBulk(packet,blastBulkTS);
 		}else {
 			updateBackwardBulk(packet,flastBulkTS);

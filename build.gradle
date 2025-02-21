@@ -1,10 +1,12 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'application'
 
 group = 'cic.unb.ca'
-version = '4.0'
-description = """CICFlowMeterV4"""
+version = '1.0-IDS'
+description = """CICFlowMeter-IDS2017-Compatible"""
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -41,7 +43,7 @@ sourceSets {
 }
 
 task zipSrc(type: Zip){
-    baseName "${applicationName}-Source"
+    baseName "CICFlowMeter-IDS2017-Compatible-Source"
     destinationDir = file('build/')
     from('.'){
         include '**/'
@@ -62,7 +64,7 @@ task zipPro(type: Zip){
         DirectoryScanner.resetDefaultExcludes()
     }
 
-    baseName "${applicationName}-Full"
+    baseName "CICFlowMeter-IDS2017-Compatible-Full"
     destinationDir = file('build/')
 
     from('.'){
@@ -125,7 +127,26 @@ task cmdScript(type: CreateStartScripts) {
     applicationName = "cfm"
     outputDir = new File(project.buildDir, 'scripts')
     classpath = jar.outputs.files + project.configurations.runtime
-    defaultJvmOpts = ["-Djava.library.path=../lib/native"]
+    
+    // Create platform-specific scripts
+    doLast {
+        // Fix Windows script
+        def winScript = new File(outputDir, "${applicationName}.bat")
+        def winContent = winScript.text
+        winContent = winContent.replaceAll(
+            /set DEFAULT_JVM_OPTS=.*/, 
+            'set DEFAULT_JVM_OPTS="-Djava.library.path=%APP_HOME%\\\\lib\\\\native"'
+        )
+        winScript.text = winContent
+
+        // Fix Unix script
+        def unixScript = new File(outputDir, applicationName)
+        def unixContent = unixScript.text
+        unixContent = unixContent.replaceAll(
+            /DEFAULT_JVM_OPTS=.*/, 
+            'DEFAULT_JVM_OPTS=\'"-Djava.library.path=\\$APP_HOME/lib/native"\'')
+        unixScript.text = unixContent
+    }
 }
 
 applicationDistribution.into("bin") {
@@ -137,7 +158,30 @@ applicationDistribution.into("bin") {
 // The Application Plugin
 mainClassName = "cic.cs.unb.ca.ifm.App"
 applicationName = "CICFlowMeter"
-applicationDefaultJvmArgs = ["-Djava.library.path=../lib/native"]
+
+// Override the default script generation
+startScripts {
+    doLast {
+        // Fix Windows script
+        def winScript = new File(outputDir, "${applicationName}.bat")
+        def winContent = winScript.text
+        winContent = winContent.replaceAll(
+            /set DEFAULT_JVM_OPTS=.*/, 
+            'set DEFAULT_JVM_OPTS="-Djava.library.path=%APP_HOME%\\lib\\native"'
+        )
+        winScript.text = winContent
+
+        // Fix Unix script
+        def unixScript = new File(outputDir, applicationName)
+        def unixContent = unixScript.text
+        unixContent = unixContent.replaceAll(
+            /DEFAULT_JVM_OPTS=.*/, 
+            'DEFAULT_JVM_OPTS=\'"-Djava.library.path=\\$APP_HOME/lib/native"\'')
+        unixScript.text = unixContent
+    }
+}
+
+// Let Gradle handle the path conversion for Unix automatically
 
 applicationDistribution.from("jnetpcap/linux/jnetpcap-1.4.r1425") {
     include "*.so"
