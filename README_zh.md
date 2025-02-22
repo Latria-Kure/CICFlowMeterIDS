@@ -37,7 +37,7 @@ sudo apt install libpcap-dev openjdk-8-jdk
 1. 下载并解压Release的压缩包
 2. 运行应用：
 ```bash
-cd CICFlowMeter-IDS2017-Compatible-1.0/bin
+cd CICFlowMeter-1.0-IDS/bin
 
 # 图形界面模式
 ./CICFlowMeter    # Linux
