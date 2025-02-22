@@ -29,9 +29,11 @@ public class DateFormatter {
             format = "dd/MM/yyyy hh:mm:ss";
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format)
+                .withLocale(java.util.Locale.ENGLISH); // Force English locale to avoid Chinese characters
         LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
-        return ldt.format(formatter);
+        return new String(ldt.format(formatter).getBytes(java.nio.charset.StandardCharsets.UTF_8)); // Ensure UTF-8
+                                                                                                    // encoding
     }
 
 }
