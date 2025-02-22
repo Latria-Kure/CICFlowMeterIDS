@@ -218,7 +218,7 @@ public class BasicFlow {
     public double getfPktsPerSecond() {
         long duration = this.flowLastSeen - this.flowStartTime;
         if (duration > 0) {
-            return (this.forward.size() / ((double) duration / 1000000L));
+            return (double) this.forward.size() / ((double) duration / 1000000L);
         } else
             return 0;
     }
@@ -226,34 +226,34 @@ public class BasicFlow {
     public double getbPktsPerSecond() {
         long duration = this.flowLastSeen - this.flowStartTime;
         if (duration > 0) {
-            return (this.backward.size() / ((double) duration / 1000000L));
+            return (double) this.backward.size() / ((double) duration / 1000000L);
         } else
             return 0;
     }
 
     public double getDownUpRatio() {
         if (this.forward.size() > 0) {
-            return (double) (this.backward.size() / this.forward.size());
+            return (double) this.backward.size() / (double) this.forward.size();
         }
         return 0;
     }
 
     public double getAvgPacketSize() {
         if (this.packetCount() > 0) {
-            return (this.flowLengthStats.getSum() / this.packetCount());
+            return (double) this.flowLengthStats.getSum() / (double) this.packetCount();
         }
         return 0;
     }
 
     public double fAvgSegmentSize() {
         if (this.forward.size() != 0)
-            return (this.fwdPktStats.getSum() / (double) this.forward.size());
+            return (double) this.fwdPktStats.getSum() / (double) this.forward.size();
         return 0;
     }
 
     public double bAvgSegmentSize() {
         if (this.backward.size() != 0)
-            return (this.bwdPktStats.getSum() / (double) this.backward.size());
+            return (double) this.bwdPktStats.getSum() / (double) this.backward.size();
         return 0;
     }
 
