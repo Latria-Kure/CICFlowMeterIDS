@@ -31,8 +31,8 @@ public class BasicFlow {
 
 	private 	long Act_data_pkt_forward;
 	private 	long min_seg_size_forward;
-	private 	int Init_Win_bytes_forward=0;
-	private 	int Init_Win_bytes_backward=0;
+	private 	int Init_Win_bytes_forward=-1;
+	private 	int Init_Win_bytes_backward=-1;
 
 
 	private		byte[] src;
@@ -187,7 +187,9 @@ public class BasicFlow {
 
     		}else{
 				this.bwdPktStats.addValue((double)packet.getPayloadBytes());
-				Init_Win_bytes_backward = packet.getTCPWindow();
+                if(Init_Win_bytes_backward == -1){
+                    Init_Win_bytes_backward = packet.getTCPWindow();
+                }
 				this.bHeaderBytes+=packet.getHeaderBytes();
     			this.backward.add(packet);
     			this.backwardBytes+=packet.getPayloadBytes();
