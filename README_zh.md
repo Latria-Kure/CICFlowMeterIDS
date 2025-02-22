@@ -56,7 +56,8 @@ cfm.bat <输入pcap文件> <输出文件夹>   # Windows
 
 #### Windows
 - [JDK 1.8](https://www.oracle.com/java/technologies/downloads/#java8)
-- [WinPcap](https://www.winpcap.org/)
+- [Npcap](https://npcap.com/) (安装时请确保选中"WinPcap API-compatible Mode"选项)
+  > 注意：应使用Npcap 来替代现在已经不再维护的 WinPcap 。如果您已安装 WinPcap，请先卸载它。
 - [Maven](https://maven.apache.org/)
 
 #### Linux
