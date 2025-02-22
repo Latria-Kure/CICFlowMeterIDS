@@ -154,8 +154,8 @@ old_data = pd.read_csv("data/output_csv_files/old.csv",)
 # 使用相同pcap文件由本项目生成的数据集
 new_data = pd.read_csv("data/output_csv_files/new.csv",)
 
-old_data['Flow Hash'] = old_data.apply(encode_flow_data, axis=1)
-new_data['Flow Hash'] = new_data.apply(encode_flow_data, axis=1)
+old_data['Flow Hash'] = old_data.apply(encode_flow_hash, axis=1)
+new_data['Flow Hash'] = new_data.apply(encode_flow_hash, axis=1)
 
 old_hash_label ={}
 
