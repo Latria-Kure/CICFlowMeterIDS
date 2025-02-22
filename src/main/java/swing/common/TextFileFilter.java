@@ -14,12 +14,12 @@ public class TextFileFilter extends FileFilter {
     private String[] exts;
     private CharSequence[] containStrs;
 
-    public TextFileFilter(String description,String[] extensions,CharSequence... searchCharSequences){
+    public TextFileFilter(String description, String[] extensions, CharSequence... searchCharSequences) {
         this.description = description;
         exts = extensions;
         containStrs = searchCharSequences;
         if (ArrayUtils.isEmpty(containStrs)) {
-            containStrs = new String[]{""};
+            containStrs = new String[] { "" };
         }
     }
 
@@ -33,7 +33,7 @@ public class TextFileFilter extends FileFilter {
         String name = f.getName();
         String extension = FilenameUtils.getExtension(name);
 
-        if (StringUtils.equalsAnyIgnoreCase(extension, exts) && StringUtils.containsAny(name,containStrs)) {
+        if (StringUtils.equalsAnyIgnoreCase(extension, exts) && StringUtils.containsAny(name, containStrs)) {
             return true;
         }
 
@@ -45,7 +45,7 @@ public class TextFileFilter extends FileFilter {
         return description;
     }
 
-    public java.io.FileFilter getFileNameFilter(){
+    public java.io.FileFilter getFileNameFilter() {
         java.io.FileFilter filter = pathname -> {
 
             if (pathname.isDirectory()) {
@@ -55,7 +55,7 @@ public class TextFileFilter extends FileFilter {
             String name = pathname.getName();
             String extension = FilenameUtils.getExtension(name);
 
-            if (StringUtils.equalsAnyIgnoreCase(extension, exts) && StringUtils.containsAny(name,containStrs)) {
+            if (StringUtils.equalsAnyIgnoreCase(extension, exts) && StringUtils.containsAny(name, containStrs)) {
                 if (!StringUtils.contains(name, LocalDate.now().toString())) {
                     return true;
                 }

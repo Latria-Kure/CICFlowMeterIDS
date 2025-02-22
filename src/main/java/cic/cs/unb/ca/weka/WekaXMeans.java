@@ -25,7 +25,6 @@ public class WekaXMeans {
     private Instances dimenReduceDataSet;
     private SummaryStatistics[] summaryStatistics;
 
-
     public WekaXMeans(Instances instances) {
 
         if (instances == null) {
@@ -35,12 +34,13 @@ public class WekaXMeans {
         xmeans = new XMeans();
 
         orgDataSet = new Instances(instances);
-        //logger.info("orgDataSet summary-> {}",orgDataSet.toSummaryString());
-        //logger.info("orgDataSet Num: {}", orgDataSet.numAttributes());
+        // logger.info("orgDataSet summary-> {}",orgDataSet.toSummaryString());
+        // logger.info("orgDataSet Num: {}", orgDataSet.numAttributes());
         dataSetWithoutStr = new Instances(instances);
         dataSetWithoutStr.deleteAttributeType(Attribute.NOMINAL);
-        //logger.info("dataSetWithoutStr summary-> {}",dataSetWithoutStr.toSummaryString());
-        //logger.info("dataSetWithoutStr Num: {}", dataSetWithoutStr.numAttributes());
+        // logger.info("dataSetWithoutStr summary->
+        // {}",dataSetWithoutStr.toSummaryString());
+        // logger.info("dataSetWithoutStr Num: {}", dataSetWithoutStr.numAttributes());
 
         summaryStatistics = new SummaryStatistics[dataSetWithoutStr.numAttributes()];
 
@@ -48,12 +48,12 @@ public class WekaXMeans {
 
     }
 
-    public void build(){
+    public void build() {
         buildRaw();
         buildDimenReduction();
     }
 
-    public void buildRaw(){
+    public void buildRaw() {
 
         try {
             xmeans.setSeed(10);
@@ -68,7 +68,8 @@ public class WekaXMeans {
     public void buildDimenReduction() {
         try {
             dimenReduceDataSet = WekaFactory.dimReduce(dataSetWithoutStr, WekaFactory.DIMENREDUCE_TSNE);
-            //dimenReduceDataSet = WekaUtils.dimReduce(dataSetWithoutStr, WekaUtils.DIMENREDUCE_WEKA_PCA);
+            // dimenReduceDataSet = WekaUtils.dimReduce(dataSetWithoutStr,
+            // WekaUtils.DIMENREDUCE_WEKA_PCA);
 
             dimenReduceXMeans.setSeed(10);
             dimenReduceXMeans.setMaxNumClusters(6);
@@ -90,12 +91,12 @@ public class WekaXMeans {
     public int getAttrIndex(Attribute attribute) {
         int index = -1;
 
-        for(int i = 0; i< dataSetWithoutStr.numAttributes(); i++) {
+        for (int i = 0; i < dataSetWithoutStr.numAttributes(); i++) {
             Attribute attr = dataSetWithoutStr.attribute(i);
 
-            if(attr.name().equals(attribute.name())) {
+            if (attr.name().equals(attribute.name())) {
                 index = i;
-                if(summaryStatistics[i]==null) {
+                if (summaryStatistics[i] == null) {
                     summaryStatistics[i] = new SummaryStatistics();
                 }
                 break;
@@ -105,20 +106,20 @@ public class WekaXMeans {
     }
 
     public double getMean(Attribute attribute) {
-        int index  = getAttrIndex(attribute);
+        int index = getAttrIndex(attribute);
 
         if (index < 0) {
             logger.info("not found {} in the data set!", attribute.name());
             return 0;
         }
 
-        if(summaryStatistics[index]==null) {
+        if (summaryStatistics[index] == null) {
             summaryStatistics[index] = new SummaryStatistics();
         }
         double[] values = dataSetWithoutStr.attributeToDoubleArray(index);
 
-        if(summaryStatistics.length != values.length) {
-            for(double value:values) {
+        if (summaryStatistics.length != values.length) {
+            for (double value : values) {
                 summaryStatistics[index].addValue(value);
             }
         }
@@ -127,10 +128,10 @@ public class WekaXMeans {
 
     private int getAttrIndex(Instances dataSet, Attribute attribute) {
         int index = -1;
-        for(int i = 0; i< dataSet.numAttributes(); i++) {
+        for (int i = 0; i < dataSet.numAttributes(); i++) {
             Attribute attr = dataSet.attribute(i);
 
-            if(attr.name().equals(attribute.name())) {
+            if (attr.name().equals(attribute.name())) {
                 index = i;
                 break;
             }
@@ -151,7 +152,7 @@ public class WekaXMeans {
             instances = orgDataSet;
         }
 
-        int index  = getAttrIndex(instances,attribute);
+        int index = getAttrIndex(instances, attribute);
         if (index < 0) {
             logger.info("not found {} in the data set!", attribute.name());
             return null;

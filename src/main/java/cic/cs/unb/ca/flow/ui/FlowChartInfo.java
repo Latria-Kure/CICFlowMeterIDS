@@ -6,7 +6,6 @@ public class FlowChartInfo {
 
     private ChartContainer cc;
 
-
     public FlowChartInfo(String name, ChartContainer cc) {
         this.name = name;
         this.cc = cc;

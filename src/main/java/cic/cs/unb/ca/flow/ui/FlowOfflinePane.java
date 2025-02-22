@@ -21,9 +21,9 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class FlowOfflinePane extends JPanel{
+public class FlowOfflinePane extends JPanel {
     protected static final Logger logger = LoggerFactory.getLogger(FlowOfflinePane.class);
-    private static final Border PADDING = BorderFactory.createEmptyBorder(10,5,10,5);
+    private static final Border PADDING = BorderFactory.createEmptyBorder(10, 5, 10, 5);
     private JFileChooser fileChooser;
     private PcapFileFilter pcapChooserFilter;
     private JTextArea textArea;
@@ -55,7 +55,7 @@ public class FlowOfflinePane extends JPanel{
         add(initCtrlPane(), BorderLayout.SOUTH);
     }
 
-    private void init(){
+    private void init() {
         fileChooser = new JFileChooser(new File("."));
         pcapChooserFilter = new PcapFileFilter();
         fileChooser.setFileFilter(pcapChooserFilter);
@@ -67,7 +67,7 @@ public class FlowOfflinePane extends JPanel{
         csvWriterThread.shutdown();
     }
 
-    private JPanel initOutPane(){
+    private JPanel initOutPane() {
         JPanel jPanel = new JPanel(new BorderLayout(5, 5));
 
         JScrollPane scrollPane = new JScrollPane();
@@ -77,14 +77,16 @@ public class FlowOfflinePane extends JPanel{
         scrollPane.setViewportView(textArea);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(0x555555)));
 
-        /*JPanel msgSettingPane = new JPanel();
-        msgSettingPane.setLayout(new BoxLayout(msgSettingPane, BoxLayout.X_AXIS));
-
-        btnClr = new JButton("Clear");
-        msgSettingPane.add(Box.createHorizontalGlue());
-        msgSettingPane.add(btnClr);
-
-        btnClr.addActionListener(actionEvent -> textArea.setText(""));*/
+        /*
+         * JPanel msgSettingPane = new JPanel();
+         * msgSettingPane.setLayout(new BoxLayout(msgSettingPane, BoxLayout.X_AXIS));
+         * 
+         * btnClr = new JButton("Clear");
+         * msgSettingPane.add(Box.createHorizontalGlue());
+         * msgSettingPane.add(btnClr);
+         * 
+         * btnClr.addActionListener(actionEvent -> textArea.setText(""));
+         */
 
         jPanel.add(scrollPane, BorderLayout.CENTER);
         jPanel.add(initOutStatusPane(), BorderLayout.SOUTH);
@@ -108,7 +110,7 @@ public class FlowOfflinePane extends JPanel{
 
         btnClr = new JButton("Clear");
         int height = fileProgress.getPreferredSize().height + fileCntProgress.getPreferredSize().height;
-        Dimension d = new Dimension(80,height);
+        Dimension d = new Dimension(80, height);
         btnClr.setPreferredSize(d);
         btnClr.setMaximumSize(d);
         btnClr.setMinimumSize(d);
@@ -124,11 +126,11 @@ public class FlowOfflinePane extends JPanel{
         return pane;
     }
 
-    private JPanel initCtrlPane(){
+    private JPanel initCtrlPane() {
         JPanel jPanel = new JPanel(new BorderLayout(5, 5));
 
         JPanel optPane = new JPanel();
-        optPane.setLayout(new BoxLayout(optPane,BoxLayout.Y_AXIS));
+        optPane.setLayout(new BoxLayout(optPane, BoxLayout.Y_AXIS));
 
         optPane.add(initFilePane());
         optPane.add(initSettingPane());
@@ -141,13 +143,12 @@ public class FlowOfflinePane extends JPanel{
         return jPanel;
     }
 
-    private JPanel initFilePane(){
+    private JPanel initFilePane() {
         JPanel jPanel = new JPanel();
         jPanel.setLayout(new GridBagLayout());
         jPanel.setBorder(PADDING);
         GridBagConstraints gc = new GridBagConstraints();
         gc.insets = new Insets(10, 0, 10, 0);
-
 
         JLabel lblInputDir = new JLabel("Pcap dir:");
         JButton btnInputBrowse = new JButton("Browse");
@@ -181,14 +182,14 @@ public class FlowOfflinePane extends JPanel{
             }
         });
 
-        //first row
+        // first row
         gc.gridx = 0;
         gc.gridy = 0;
         gc.weightx = 0;
         gc.weighty = 0.1;
         gc.fill = GridBagConstraints.NONE;
         gc.anchor = GridBagConstraints.LINE_END;
-        //gc.insets = new Insets(10, 5, 10, 5);
+        // gc.insets = new Insets(10, 5, 10, 5);
         jPanel.add(lblInputDir, gc);
 
         gc.gridx = 1;
@@ -197,7 +198,7 @@ public class FlowOfflinePane extends JPanel{
         gc.weighty = 0.1;
         gc.fill = GridBagConstraints.HORIZONTAL;
         gc.anchor = GridBagConstraints.LINE_START;
-        //gc.insets = new Insets(0, 10, 0, 0);
+        // gc.insets = new Insets(0, 10, 0, 0);
         gc.insets.left = gc.insets.right = 10;
         jPanel.add(cmbInput, gc);
 
@@ -206,17 +207,17 @@ public class FlowOfflinePane extends JPanel{
         gc.weightx = 0;
         gc.fill = GridBagConstraints.NONE;
         gc.anchor = GridBagConstraints.LINE_END;
-        //gc.insets = new Insets(10, 5, 10, 0);
+        // gc.insets = new Insets(10, 5, 10, 0);
         jPanel.add(btnInputBrowse, gc);
 
-        //second row
+        // second row
         gc.gridx = 0;
         gc.gridy = 1;
         gc.weightx = 0;
         gc.weighty = 0.1;
         gc.fill = GridBagConstraints.NONE;
         gc.anchor = GridBagConstraints.LINE_END;
-        //gc.insets = new Insets(10, 5, 10, 5);
+        // gc.insets = new Insets(10, 5, 10, 5);
         jPanel.add(lblOutputDir, gc);
 
         gc.gridx = 1;
@@ -224,7 +225,7 @@ public class FlowOfflinePane extends JPanel{
         gc.weightx = 1;
         gc.fill = GridBagConstraints.HORIZONTAL;
         gc.anchor = GridBagConstraints.LINE_START;
-        //gc.insets = new Insets(0, 10, 0, 0);
+        // gc.insets = new Insets(0, 10, 0, 0);
         gc.insets.left = gc.insets.right = 10;
         jPanel.add(cmbOutput, gc);
 
@@ -233,17 +234,16 @@ public class FlowOfflinePane extends JPanel{
         gc.weightx = 0;
         gc.fill = GridBagConstraints.NONE;
         gc.anchor = GridBagConstraints.LINE_END;
-        //gc.insets = new Insets(10, 5, 10, 0);
+        // gc.insets = new Insets(10, 5, 10, 0);
         jPanel.add(btnOutputBrowse, gc);
-
 
         return jPanel;
     }
 
-    private JPanel initSettingPane(){
+    private JPanel initSettingPane() {
 
         JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BoxLayout(jPanel,BoxLayout.X_AXIS));
+        jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.X_AXIS));
         jPanel.setBorder(PADDING);
 
         JLabel lbl1 = new JLabel("Flow TimeOut:");
@@ -269,11 +269,11 @@ public class FlowOfflinePane extends JPanel{
 
     private JPanel initActionPane() {
         JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BoxLayout(jPanel,BoxLayout.X_AXIS));
+        jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.X_AXIS));
         jPanel.setBorder(PADDING);
 
         JButton btnOK = new JButton("OK");
-        Dimension d = new Dimension(80,36);
+        Dimension d = new Dimension(80, 36);
         btnOK.setPreferredSize(d);
         btnOK.setMaximumSize(d);
         btnOK.setMinimumSize(d);
@@ -300,7 +300,8 @@ public class FlowOfflinePane extends JPanel{
         textArea.append(System.lineSeparator());
     }
 
-    private long getComboParameter(JComboBox<Long> param,Vector<Long> paramEle) throws ClassCastException,NumberFormatException{
+    private long getComboParameter(JComboBox<Long> param, Vector<Long> paramEle)
+            throws ClassCastException, NumberFormatException {
         long ret;
         int index = param.getSelectedIndex();
         String input;
@@ -322,12 +323,12 @@ public class FlowOfflinePane extends JPanel{
         return ret;
     }
 
-    private void startReadPcap(){
+    private void startReadPcap() {
         final File in;
         int cmbInIndex = cmbInput.getSelectedIndex();
         if (cmbInIndex < 0) {
             in = new File((String) cmbInput.getEditor().getItem());
-        }else{
+        } else {
             in = cmbInputEle.get(cmbInIndex);
         }
 
@@ -335,7 +336,7 @@ public class FlowOfflinePane extends JPanel{
         int cmbOutIndex = cmbOutput.getSelectedIndex();
         if (cmbOutIndex < 0) {
             out = new File((String) cmbOutput.getEditor().getItem());
-        }else{
+        } else {
             out = cmbOutputEle.get(cmbOutIndex);
         }
 
@@ -355,7 +356,7 @@ public class FlowOfflinePane extends JPanel{
             worker.addPropertyChangeListener(evt -> {
                 ReadPcapFileWorker task = (ReadPcapFileWorker) evt.getSource();
                 if ("progress".equals(evt.getPropertyName())) {
-                    //logger.info("progress -> {}", evt.getNewValue());
+                    // logger.info("progress -> {}", evt.getNewValue());
                     List<String> chunks = (List<String>) evt.getNewValue();
                     if (chunks != null) {
                         SwingUtilities.invokeLater(() -> {
@@ -377,7 +378,7 @@ public class FlowOfflinePane extends JPanel{
                 } else if (ReadPcapFileWorker.PROPERTY_FILE_CNT.equalsIgnoreCase(evt.getPropertyName())) {
 
                     int max = (int) evt.getOldValue();
-                    int cur = (int) evt.getNewValue()+1;
+                    int cur = (int) evt.getNewValue() + 1;
 
                     fileCntProgress.setIndeterminate(false);
                     fileCntProgress.setMaximum(max);
@@ -395,18 +396,21 @@ public class FlowOfflinePane extends JPanel{
 
                     flowCnt.put(fileName, flowCnt.get(fileName) + 1);
 
-                    String msg = String.format("%d flows on Reading %s",flowCnt.get(fileName),fileName);
+                    String msg = String.format("%d flows on Reading %s", flowCnt.get(fileName), fileName);
                     fileProgress.setString(msg);
 
-                    //write flows to csv file
-                    String header  = FlowFeature.getHeader();
-                    csvWriterThread.execute(new InsertCsvRow(header, flow.dumpFlowBasedFeaturesEx(), out.getPath(), fileName+FlowMgr.FLOW_SUFFIX));
+                    // write flows to csv file
+                    String header = FlowFeature.getHeader();
+                    csvWriterThread.execute(new InsertCsvRow(header, flow.dumpFlowBasedFeaturesEx(), out.getPath(),
+                            fileName + FlowMgr.FLOW_SUFFIX));
                 }
             });
             worker.execute();
-        } catch(ClassCastException | NumberFormatException e){
-            logger.info("startRead: {}",e.getMessage());
-            JOptionPane.showMessageDialog(FlowOfflinePane.this, "The parameter is not a number,please check and try again.", "Parameter error", JOptionPane.ERROR_MESSAGE);
+        } catch (ClassCastException | NumberFormatException e) {
+            logger.info("startRead: {}", e.getMessage());
+            JOptionPane.showMessageDialog(FlowOfflinePane.this,
+                    "The parameter is not a number,please check and try again.", "Parameter error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 }

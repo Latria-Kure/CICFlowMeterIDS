@@ -14,7 +14,6 @@ public class Utils {
     private final static String PCAP = "application/vnd.tcpdump.pcap";
     public static final String FLOW_SUFFIX = "_Flow.csv";
 
-
     private static boolean isPcapFile(String contentType) {
 
         return PCAP.equalsIgnoreCase(contentType);
@@ -28,9 +27,11 @@ public class Utils {
 
         try {
 
-            //Files.probeContentType returns null on Windows
-            /*Path filePath = Paths.get(file.getPath());
-            contentType = Files.probeContentType(filePath);*/
+            // Files.probeContentType returns null on Windows
+            /*
+             * Path filePath = Paths.get(file.getPath());
+             * contentType = Files.probeContentType(filePath);
+             */
 
             return isPcapFile(new Tika().detect(file));
 
@@ -57,7 +58,7 @@ public class Utils {
     }
 
     public static long countLines(String fileName) {
-        File file =new File(fileName);
+        File file = new File(fileName);
         int linenumber = 0;
         FileReader fr;
         LineNumberReader lnr = null;
@@ -65,7 +66,7 @@ public class Utils {
             fr = new FileReader(file);
             lnr = new LineNumberReader(fr);
 
-            while (lnr.readLine() != null){
+            while (lnr.readLine() != null) {
                 linenumber++;
             }
 

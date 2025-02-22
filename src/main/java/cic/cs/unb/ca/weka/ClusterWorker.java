@@ -9,7 +9,7 @@ import java.io.File;
 /**
  * Created by yzhang29 on 02/01/18.
  */
-public class ClusterWorker extends SwingWorker<WekaXMeans,Integer> {
+public class ClusterWorker extends SwingWorker<WekaXMeans, Integer> {
 
     protected static final Logger logger = LoggerFactory.getLogger(ClusterWorker.class);
 
@@ -17,16 +17,16 @@ public class ClusterWorker extends SwingWorker<WekaXMeans,Integer> {
     public static final int URL_CSV = 2;
 
     private File csvfile;
-    private int  csv_source;
+    private int csv_source;
 
-    public ClusterWorker(File csvfile,int src) {
+    public ClusterWorker(File csvfile, int src) {
         this.csvfile = csvfile;
         csv_source = src;
     }
 
     @Override
     protected WekaXMeans doInBackground() throws Exception {
-        logger.info("build file:{}",csvfile.getPath());
+        logger.info("build file:{}", csvfile.getPath());
 
         WekaXMeans xMeans = null;
         switch (csv_source) {

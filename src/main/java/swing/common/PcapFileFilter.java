@@ -14,11 +14,10 @@ public class PcapFileFilter extends FileFilter {
 
         if (file.isDirectory()) {
             return true;
-        }else {
+        } else {
             return SwingUtils.isPcapFile(file);
         }
     }
-
 
     @Override
     public String getDescription() {

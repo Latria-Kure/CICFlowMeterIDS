@@ -10,18 +10,17 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlowChartPane extends JPanel{
+public class FlowChartPane extends JPanel {
     protected static final Logger logger = LoggerFactory.getLogger(FlowChartPane.class);
 
     private JPanel chartPane;
     private List<ChartContainer> ccList = new ArrayList<>();
     private ChartContainer focusCC = null;
 
-
     public FlowChartPane() {
 
         init();
-        setLayout(new BorderLayout(0,0));
+        setLayout(new BorderLayout(0, 0));
         setOpaque(true);
         JScrollPane jScrollPane = new JScrollPane(initBoxPane());
         jScrollPane.setPreferredSize(getPreferredSize());
@@ -36,7 +35,7 @@ public class FlowChartPane extends JPanel{
     private JPanel initBoxPane() {
         chartPane = new JPanel();
 
-        chartPane.setLayout(new BoxLayout(chartPane,BoxLayout.Y_AXIS));
+        chartPane.setLayout(new BoxLayout(chartPane, BoxLayout.Y_AXIS));
         chartPane.setOpaque(true);
 
         return chartPane;
@@ -56,12 +55,11 @@ public class FlowChartPane extends JPanel{
         chartPane.revalidate();
     }
 
-    public void removeChart(){
+    public void removeChart() {
         chartPane.removeAll();
         chartPane.revalidate();
         chartPane.repaint();
     }
-
 
     public void zoomIn() {
         if (focusCC != null) {

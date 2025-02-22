@@ -14,7 +14,6 @@ public class FlowFileInfo {
         this.xMeans = xMeans;
     }
 
-
     @Override
     public String toString() {
         return filepath.getName();

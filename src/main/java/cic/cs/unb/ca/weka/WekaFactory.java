@@ -23,8 +23,7 @@ public class WekaFactory {
 
     private static WekaFactory instanceFactory = new WekaFactory();
 
-    //private Instances mEmptyFlowInstances;
-
+    // private Instances mEmptyFlowInstances;
 
     public static final String DIMENREDUCE_TSNE = "t-sne";
     public static final String DIMENREDUCE_WEKA_PCA = "weka-pca";
@@ -32,36 +31,39 @@ public class WekaFactory {
     public static final Attribute DRATTRX = new Attribute("X");
     public static final Attribute DRATTRY = new Attribute("Y");
 
-
     public static WekaFactory getFactory() {
         return instanceFactory;
     }
 
     public WekaFactory init() {
 
-        /*List<FlowFeature> featureList = FlowFeature.getFeatureList();
-        FastVector fastVector = new FastVector();
-        for (FlowFeature feature : featureList) {
-            Attribute attribute = feature2attr(feature.getName(),feature.isNumeric());
-            fastVector.addElement(attribute);
-        }
-        mEmptyFlowInstances = new Instances("cic_flow_feature",fastVector,0);
-        logger.debug("{}",mEmptyFlowInstances.toSummaryString());*/
+        /*
+         * List<FlowFeature> featureList = FlowFeature.getFeatureList();
+         * FastVector fastVector = new FastVector();
+         * for (FlowFeature feature : featureList) {
+         * Attribute attribute = feature2attr(feature.getName(),feature.isNumeric());
+         * fastVector.addElement(attribute);
+         * }
+         * mEmptyFlowInstances = new Instances("cic_flow_feature",fastVector,0);
+         * logger.debug("{}",mEmptyFlowInstances.toSummaryString());
+         */
 
         return instanceFactory;
     }
 
-    /*public Instances createEmptyFlowInstances() {
-        return new Instances(mEmptyFlowInstances,0);
-    }
-
-    public int numAttributesOfFlowInstances() {
-        return mEmptyFlowInstances.numAttributes();
-    }*/
+    /*
+     * public Instances createEmptyFlowInstances() {
+     * return new Instances(mEmptyFlowInstances,0);
+     * }
+     * 
+     * public int numAttributesOfFlowInstances() {
+     * return mEmptyFlowInstances.numAttributes();
+     * }
+     */
 
     public static Instances loadURLCsv(File file) {
-        logger.debug("loadURLCsv {}",file.getPath());
-        Instances instances=null;
+        logger.debug("loadURLCsv {}", file.getPath());
+        Instances instances = null;
 
         CSVLoader loader = new CSVLoader();
 
@@ -69,14 +71,14 @@ public class WekaFactory {
             loader.setSource(file);
             instances = loader.getDataSet();
 
-            //logger.info("loadURLCsv org->> {}",instances.toSummaryString());
+            // logger.info("loadURLCsv org->> {}",instances.toSummaryString());
             instances.deleteAttributeType(Attribute.NOMINAL);
 
             Enumeration<Attribute> enuAttr = instances.enumerateAttributes();
-            while(enuAttr.hasMoreElements()) {
+            while (enuAttr.hasMoreElements()) {
                 instances.deleteWithMissing(enuAttr.nextElement());
             }
-            logger.debug("loadURLCsv summary-> {}",instances.toSummaryString());
+            logger.debug("loadURLCsv summary-> {}", instances.toSummaryString());
 
         } catch (IOException e) {
             logger.debug(e.getMessage());
@@ -86,8 +88,8 @@ public class WekaFactory {
     }
 
     public static Instances loadFlowCsv(File file) {
-        logger.debug("loadFlowCsv {}",file.getPath());
-        Instances instances=null;
+        logger.debug("loadFlowCsv {}", file.getPath());
+        Instances instances = null;
 
         CSVLoader loader = new CSVLoader();
         try {
@@ -95,12 +97,12 @@ public class WekaFactory {
             instances = loader.getDataSet();
 
             Enumeration<Attribute> enuAttr = instances.enumerateAttributes();
-            while(enuAttr.hasMoreElements()) {
+            while (enuAttr.hasMoreElements()) {
                 instances.deleteWithMissing(enuAttr.nextElement());
             }
-            logger.debug("loadFlowCsv summary-> {}",instances.toSummaryString());
+            logger.debug("loadFlowCsv summary-> {}", instances.toSummaryString());
 
-        }catch(IOException e) {
+        } catch (IOException e) {
             logger.debug(e.getMessage());
         }
         return instances;
@@ -110,18 +112,18 @@ public class WekaFactory {
         FastVector fv = new FastVector();
         fv.addElement(DRATTRX);
         fv.addElement(DRATTRY);
-        Instances insts = new Instances(dimReAlgorithm,fv,0);
-        //logger.info("{}",insts.toSummaryString());
+        Instances insts = new Instances(dimReAlgorithm, fv, 0);
+        // logger.info("{}",insts.toSummaryString());
         return insts;
     }
 
     private static DimenReduce getDimenReduceMethod(String arg) {
 
-        DimenReduce dr=null;
+        DimenReduce dr = null;
 
-        switch(arg) {
+        switch (arg) {
             case DIMENREDUCE_TSNE:
-                //dr =  new DimReImplTSNE();
+                // dr = new DimReImplTSNE();
                 break;
         }
         return dr;
@@ -133,49 +135,49 @@ public class WekaFactory {
 
         DimenReduce dr = getDimenReduceMethod(arg);
 
-        if(arg==null||arg.equals(DIMENREDUCE_WEKA_PCA)||dr==null) {
+        if (arg == null || arg.equals(DIMENREDUCE_WEKA_PCA) || dr == null) {
             try {
                 PrincipalComponents pca = new PrincipalComponents();
                 pca.setMaximumAttributes(2);
                 pca.setInputFormat(org);
                 instances = Filter.useFilter(org, pca);
-            }catch(Exception e) {
+            } catch (Exception e) {
                 logger.debug(e.getMessage());
             }
-        }else{
+        } else {
             double[][] orgData = instances2doubleArray(org);
 
             double[][] newData = dr.dimensionReduce(orgData);
 
-            for(int i=0;i<newData.length;i++) {
+            for (int i = 0; i < newData.length; i++) {
                 Instance inst = new Instance(instances.numAttributes());
                 inst.setValue(DRATTRX, newData[i][0]);
                 inst.setValue(DRATTRY, newData[i][1]);
                 instances.add(inst);
             }
         }
-        logger.debug("{}",instances.toSummaryString());
+        logger.debug("{}", instances.toSummaryString());
         return instances;
     }
 
-    public static double[][] instances2doubleArray(final Instances instances){
+    public static double[][] instances2doubleArray(final Instances instances) {
 
         int num = instances.numInstances();
 
-        double[][] ret  = new double[num][];
+        double[][] ret = new double[num][];
 
-        for(int i=0;i<num;i++) {
+        for (int i = 0; i < num; i++) {
             Instance inst = instances.instance(i);
             ret[i] = inst.toDoubleArray();
         }
         return ret;
     }
 
-    public static Attribute feature2attr(String featurename,boolean isNumeric){
+    public static Attribute feature2attr(String featurename, boolean isNumeric) {
         Attribute attr;
-        if(isNumeric) {
+        if (isNumeric) {
             attr = new Attribute(featurename);
-        }else {
+        } else {
             attr = new Attribute(featurename, (FastVector) null);
         }
         return attr;

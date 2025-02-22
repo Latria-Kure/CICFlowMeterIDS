@@ -18,24 +18,24 @@ public class PcapIfWrapper {
         this.prompt = prompt;
     }
 
-    public static List<PcapIfWrapper> fromPcapIf(List<PcapIf> ifs){
+    public static List<PcapIfWrapper> fromPcapIf(List<PcapIf> ifs) {
         List<PcapIfWrapper> ifWrappers = new ArrayList<>();
-        for(PcapIf pcapif:ifs){
+        for (PcapIf pcapif : ifs) {
             ifWrappers.add(new PcapIfWrapper(pcapif));
         }
         return ifWrappers;
     }
 
-    public String name(){
+    public String name() {
         return pcapIf.getName();
     }
 
     @Override
     public String toString() {
-        if(pcapIf == null){
+        if (pcapIf == null) {
             return prompt;
-        }else{
-            return String.format("%s (%s)",pcapIf.getName(),pcapIf.getDescription());
+        } else {
+            return String.format("%s (%s)", pcapIf.getName(), pcapIf.getDescription());
         }
     }
 }

@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class JTable2CSVWorker extends SwingWorker<String,String> {
+public class JTable2CSVWorker extends SwingWorker<String, String> {
     protected static final Logger logger = LoggerFactory.getLogger(JTable2CSVWorker.class);
 
     private JTable table;
@@ -23,7 +23,7 @@ public class JTable2CSVWorker extends SwingWorker<String,String> {
         }
 
         if (file.isDirectory()) {
-            throw new IllegalArgumentException(file.toString()+" is NOT a file!!!");
+            throw new IllegalArgumentException(file.toString() + " is NOT a file!!!");
         }
 
         this.table = table;
@@ -50,7 +50,7 @@ public class JTable2CSVWorker extends SwingWorker<String,String> {
                 tableHeader.append(model.getColumnName(j)).append(",");
             }
             tableHeader.deleteCharAt(tableHeader.length() - 1);
-            //logger.info("header: {}", tableHeader.toString());
+            // logger.info("header: {}", tableHeader.toString());
 
             csv.write(tableHeader.toString() + Sys.LINE_SEP);
 
@@ -61,11 +61,11 @@ public class JTable2CSVWorker extends SwingWorker<String,String> {
                     tableRow.append(model.getValueAt(i, j).toString()).append(",");
                 }
                 tableRow.deleteCharAt(tableRow.length() - 1);
-                //logger.info("row: {}", tableRow.toString());
+                // logger.info("row: {}", tableRow.toString());
                 csv.write(tableRow.toString() + Sys.LINE_SEP);
             }
 
-        }catch (IOException e) {
+        } catch (IOException e) {
             logger.debug(e.getMessage());
             logger.info("JTable2CSVWorker: {}", e.getMessage());
         } finally {
