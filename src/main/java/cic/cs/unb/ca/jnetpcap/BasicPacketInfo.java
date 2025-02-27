@@ -47,6 +47,11 @@ public class BasicPacketInfo {
         this.id = generator.nextId();
     }
 
+    public BasicPacketInfo(IdGenerator generator, long preGeneratedId) {
+        super();
+        this.id = preGeneratedId;
+    }
+
     public String generateFlowId() {
         boolean forward = true;
 

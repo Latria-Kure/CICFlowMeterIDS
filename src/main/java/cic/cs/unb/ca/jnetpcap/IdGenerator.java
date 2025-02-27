@@ -11,6 +11,7 @@ public class IdGenerator {
 
     public IdGenerator() {
         super();
+        // Start with ID as 0, so first call to nextId returns 1 (one-based indexing)
         this.id = 0L;
     }
 

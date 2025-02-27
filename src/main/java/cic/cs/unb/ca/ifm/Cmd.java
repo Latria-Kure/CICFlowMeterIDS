@@ -29,6 +29,7 @@ public class Cmd {
         String rootPath = System.getProperty("user.dir");
         String pcapPath;
         String outPath;
+        boolean savePacketInfo = false; // Default: don't save packet information
 
         /* Select path for reading all .pcap files */
         /*
@@ -69,24 +70,36 @@ public class Cmd {
             return;
         }
 
+        // Check for save-packet-info option
+        for (int i = 2; i < args.length; i++) {
+            if (args[i].equalsIgnoreCase("--save-packet-info") ||
+                    args[i].equalsIgnoreCase("--save_packet-info") ||
+                    args[i].equalsIgnoreCase("--save_packet_info") ||
+                    args[i].equalsIgnoreCase("--savepacketinfo")) {
+                savePacketInfo = true;
+                logger.info("Saving packet information to JSON files is enabled");
+            }
+        }
+
         logger.info("You select: {}", pcapPath);
         logger.info("Out folder: {}", outPath);
 
         if (in.isDirectory()) {
-            readPcapDir(in, outPath, flowTimeout, activityTimeout);
+            readPcapDir(in, outPath, flowTimeout, activityTimeout, savePacketInfo);
         } else {
 
             if (!SwingUtils.isPcapFile(in)) {
                 logger.info("Please select pcap file!");
             } else {
                 logger.info("CICFlowMeter received 1 pcap file");
-                readPcapFile(in.getPath(), outPath, flowTimeout, activityTimeout);
+                readPcapFile(in.getPath(), outPath, flowTimeout, activityTimeout, savePacketInfo);
             }
         }
 
     }
 
-    private static void readPcapDir(File inputPath, String outPath, long flowTimeout, long activityTimeout) {
+    private static void readPcapDir(File inputPath, String outPath, long flowTimeout, long activityTimeout,
+            boolean savePacketInfo) {
         if (inputPath == null || outPath == null) {
             return;
         }
@@ -100,13 +113,14 @@ public class Cmd {
             }
             int cur = i + 1;
             System.out.println(String.format("==> %d / %d", cur, file_cnt));
-            readPcapFile(file.getPath(), outPath, flowTimeout, activityTimeout);
+            readPcapFile(file.getPath(), outPath, flowTimeout, activityTimeout, savePacketInfo);
 
         }
         System.out.println("Completed!");
     }
 
-    private static void readPcapFile(String inputFile, String outPath, long flowTimeout, long activityTimeout) {
+    private static void readPcapFile(String inputFile, String outPath, long flowTimeout, long activityTimeout,
+            boolean savePacketInfo) {
         if (inputFile == null || outPath == null) {
             return;
         }
@@ -124,8 +138,8 @@ public class Cmd {
             }
         }
 
-        FlowGenerator flowGen = new FlowGenerator(true, flowTimeout, activityTimeout);
-        flowGen.addFlowListener(new FlowListener(fileName, outPath));
+        FlowGenerator flowGen = new FlowGenerator(true, flowTimeout, activityTimeout, savePacketInfo);
+        flowGen.addFlowListener(new FlowListener(fileName, outPath, flowGen, savePacketInfo));
         boolean readIP6 = false;
         boolean readIP4 = true;
         PacketReader packetReader = new PacketReader(inputFile, readIP4, readIP6);
@@ -145,6 +159,9 @@ public class Cmd {
             try {
                 BasicPacketInfo basicPacket = packetReader.nextPacket();
                 nTotal++;
+                if (nTotal == 966491) {
+                    int a = 1;
+                }
                 if (basicPacket != null) {
                     flowGen.addPacket(basicPacket);
                     nValid++;
@@ -185,18 +202,29 @@ public class Cmd {
     static class FlowListener implements FlowGenListener {
 
         private String fileName;
-
         private String outPath;
-
         private long cnt;
+        private FlowGenerator flowGen;
+        private boolean savePacketInfo;
 
         public FlowListener(String fileName, String outPath) {
             this.fileName = fileName;
             this.outPath = outPath;
         }
 
+        public FlowListener(String fileName, String outPath, FlowGenerator flowGen, boolean savePacketInfo) {
+            this.fileName = fileName;
+            this.outPath = outPath;
+            this.flowGen = flowGen;
+            this.savePacketInfo = savePacketInfo;
+        }
+
         @Override
         public void onFlowGenerated(BasicFlow flow) {
+            // Save packet information if enabled
+            if (savePacketInfo && flowGen != null) {
+                flowGen.saveFlowPacketsToJson(flow, outPath);
+            }
 
             String flowDump = flow.dumpFlowBasedFeaturesEx();
             List<String> flowStringList = new ArrayList<>();

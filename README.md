@@ -47,6 +47,10 @@ CICFlowMeter.bat  # Windows
 # Command Line Mode
 ./cfm <input-pcap-file> <output-folder>     # Linux
 cfm.bat <input-pcap-file> <output-folder>   # Windows
+
+# Command Line Mode with packet tracking (outputs packet numbers to <flow-id>.json files for every flow)
+./cfm <input-pcap-file> <output-folder> --savepacketinfo     # Linux
+cfm.bat <input-pcap-file> <output-folder> --savepacketinfo   # Windows
 ```
 
 ## Building from Source
@@ -133,6 +137,28 @@ for idx, row in old_data.iterrows():
 
 new_data['Label'] = new_data['Flow Hash'].map(old_hash_label)
 ```
+
+### JSON Packet Tracking Format
+
+When using the `--save-packet-info` option, the tool will generate JSON files that map each flow to the packet numbers in the original PCAP file. The JSON format looks like:
+
+```json
+{
+    "1": [1, 3, 7, 9],
+    "2": [2, 4, 6, 8],
+    "3": [5]
+}
+```
+
+This indicates that there are three flows with the same flow ID:
+- Flow 1 consists of packets 1, 3, 7, and 9
+- Flow 2 consists of packets 2, 4, 6, and 8
+- Flow 3 consists of packet 5
+
+These packet numbers are 1-based (they start from 1) and correspond to the packet positions in the original PCAP file. This feature is useful for:
+- Tracing which packets contributed to a specific flow
+- Extracting packets from specific flows for deeper analysis
+- Validating flow generation and feature extraction
 
 
 

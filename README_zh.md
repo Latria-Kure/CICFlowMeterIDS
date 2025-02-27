@@ -47,7 +47,13 @@ CICFlowMeter.bat  # Windows
 # 命令行模式
 ./cfm <输入pcap文件> <输出文件夹>     # Linux
 cfm.bat <输入pcap文件> <输出文件夹>   # Windows
+
+# 命令行模式下开启包跟踪 (将每条Flow的Packet序号保存至<flow-id>.json文件中)
+./cfm <input-pcap-file> <output-folder> --savepacketinfo     # Linux
+cfm.bat <input-pcap-file> <output-folder> --savepacketinfo   # Windows
 ```
+
+
 > 注：无论是GUI还是命令行模式，输入输出文件路径都不可携带中文。
 
 ## 从源码构建

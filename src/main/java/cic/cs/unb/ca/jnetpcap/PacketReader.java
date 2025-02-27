@@ -79,23 +79,26 @@ public class PacketReader {
         BasicPacketInfo packetInfo = null;
         try {
             if (pcapReader.nextEx(hdr, buf) == Pcap.NEXT_EX_OK) {
+                // Increment ID for every packet read, even if it will be discarded
+                long currentPacketId = generator.nextId();
+
                 packet = new PcapPacket(hdr, buf);
                 packet.scan(Ethernet.ID);
 
                 if (this.readIP4) {
-                    packetInfo = getIpv4Info(packet);
+                    packetInfo = getIpv4Info(packet, currentPacketId);
                     if (packetInfo == null && this.readIP6) {
-                        packetInfo = getIpv6Info(packet);
+                        packetInfo = getIpv6Info(packet, currentPacketId);
                     }
                 } else if (this.readIP6) {
-                    packetInfo = getIpv6Info(packet);
+                    packetInfo = getIpv6Info(packet, currentPacketId);
                     if (packetInfo == null && this.readIP4) {
-                        packetInfo = getIpv4Info(packet);
+                        packetInfo = getIpv4Info(packet, currentPacketId);
                     }
                 }
 
                 if (packetInfo == null) {
-                    packetInfo = getVPNInfo(packet);
+                    packetInfo = getVPNInfo(packet, currentPacketId);
                 }
 
             } else {
@@ -110,12 +113,12 @@ public class PacketReader {
         return packetInfo;
     }
 
-    private BasicPacketInfo getIpv4Info(PcapPacket packet) {
+    private BasicPacketInfo getIpv4Info(PcapPacket packet, long packetId) {
         BasicPacketInfo packetInfo = null;
         try {
 
             if (packet.hasHeader(ipv4)) {
-                packetInfo = new BasicPacketInfo(this.generator);
+                packetInfo = new BasicPacketInfo(this.generator, packetId);
                 packetInfo.setSrc(this.ipv4.source());
                 packetInfo.setDst(this.ipv4.destination());
                 // packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMillis());
@@ -185,11 +188,11 @@ public class PacketReader {
         return packetInfo;
     }
 
-    private BasicPacketInfo getIpv6Info(PcapPacket packet) {
+    private BasicPacketInfo getIpv6Info(PcapPacket packet, long packetId) {
         BasicPacketInfo packetInfo = null;
         try {
             if (packet.hasHeader(ipv6)) {
-                packetInfo = new BasicPacketInfo(this.generator);
+                packetInfo = new BasicPacketInfo(this.generator, packetId);
                 packetInfo.setSrc(this.ipv6.source());
                 packetInfo.setDst(this.ipv6.destination());
                 packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMillis());
@@ -226,7 +229,7 @@ public class PacketReader {
         return packetInfo;
     }
 
-    private BasicPacketInfo getVPNInfo(PcapPacket packet) {
+    private BasicPacketInfo getVPNInfo(PcapPacket packet, long packetId) {
         BasicPacketInfo packetInfo = null;
         try {
             packet.scan(L2TP.ID);
@@ -234,17 +237,17 @@ public class PacketReader {
             if (packet.hasHeader(l2tp)) {
                 if (this.readIP4) {
                     packet.scan(ipv4.getId());
-                    packetInfo = getIpv4Info(packet);
+                    packetInfo = getIpv4Info(packet, packetId);
                     if (packetInfo == null && this.readIP6) {
                         packet.scan(ipv6.getId());
-                        packetInfo = getIpv6Info(packet);
+                        packetInfo = getIpv6Info(packet, packetId);
                     }
                 } else if (this.readIP6) {
                     packet.scan(ipv6.getId());
-                    packetInfo = getIpv6Info(packet);
+                    packetInfo = getIpv6Info(packet, packetId);
                     if (packetInfo == null && this.readIP4) {
                         packet.scan(ipv4.getId());
-                        packetInfo = getIpv4Info(packet);
+                        packetInfo = getIpv4Info(packet, packetId);
                     }
                 }
 
@@ -295,26 +298,31 @@ public class PacketReader {
 
         Protocol protocol = new Protocol();
 
+        // Increment ID for every packet processed, regardless of whether it will be
+        // valid
+        long currentPacketId = idGen.nextId();
+
         if (readIP4) {
-            packetInfo = getIpv4Info(packet, protocol);
+            packetInfo = getIpv4Info(packet, protocol, currentPacketId);
             if (packetInfo == null && readIP6) {
-                packetInfo = getIpv6Info(packet, protocol);
+                packetInfo = getIpv6Info(packet, protocol, currentPacketId);
             }
         } else if (readIP6) {
-            packetInfo = getIpv6Info(packet, protocol);
+            packetInfo = getIpv6Info(packet, protocol, currentPacketId);
             if (packetInfo == null && readIP4) {
-                packetInfo = getIpv4Info(packet, protocol);
+                packetInfo = getIpv4Info(packet, protocol, currentPacketId);
             }
         }
 
         if (packetInfo == null) {
-            packetInfo = getVPNInfo(packet, protocol, readIP4, readIP6);
+            packetInfo = getVPNInfo(packet, protocol, readIP4, readIP6, currentPacketId);
         }
 
         return packetInfo;
     }
 
-    private static BasicPacketInfo getVPNInfo(PcapPacket packet, Protocol protocol, boolean readIP4, boolean readIP6) {
+    private static BasicPacketInfo getVPNInfo(PcapPacket packet, Protocol protocol, boolean readIP4, boolean readIP6,
+            long packetId) {
         BasicPacketInfo packetInfo = null;
         try {
             packet.scan(L2TP.ID);
@@ -322,17 +330,17 @@ public class PacketReader {
             if (packet.hasHeader(protocol.getL2tp())) {
                 if (readIP4) {
                     packet.scan(protocol.getIpv4().getId());
-                    packetInfo = getIpv4Info(packet, protocol);
+                    packetInfo = getIpv4Info(packet, protocol, packetId);
                     if (packetInfo == null && readIP6) {
                         packet.scan(protocol.getIpv6().getId());
-                        packetInfo = getIpv6Info(packet, protocol);
+                        packetInfo = getIpv6Info(packet, protocol, packetId);
                     }
                 } else if (readIP6) {
                     packet.scan(protocol.getIpv6().getId());
-                    packetInfo = getIpv6Info(packet, protocol);
+                    packetInfo = getIpv6Info(packet, protocol, packetId);
                     if (packetInfo == null && readIP4) {
                         packet.scan(protocol.getIpv4().getId());
-                        packetInfo = getIpv4Info(packet, protocol);
+                        packetInfo = getIpv4Info(packet, protocol, packetId);
                     }
                 }
 
@@ -360,11 +368,11 @@ public class PacketReader {
         return packetInfo;
     }
 
-    private static BasicPacketInfo getIpv6Info(PcapPacket packet, Protocol protocol) {
+    private static BasicPacketInfo getIpv6Info(PcapPacket packet, Protocol protocol, long packetId) {
         BasicPacketInfo packetInfo = null;
         try {
             if (packet.hasHeader(protocol.getIpv6())) {
-                packetInfo = new BasicPacketInfo(idGen);
+                packetInfo = new BasicPacketInfo(idGen, packetId);
                 packetInfo.setSrc(protocol.getIpv6().source());
                 packetInfo.setDst(protocol.getIpv6().destination());
                 packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMillis());
@@ -407,12 +415,12 @@ public class PacketReader {
         return packetInfo;
     }
 
-    private static BasicPacketInfo getIpv4Info(PcapPacket packet, Protocol protocol) {
+    private static BasicPacketInfo getIpv4Info(PcapPacket packet, Protocol protocol, long packetId) {
         BasicPacketInfo packetInfo = null;
         try {
 
             if (packet.hasHeader(protocol.getIpv4())) {
-                packetInfo = new BasicPacketInfo(idGen);
+                packetInfo = new BasicPacketInfo(idGen, packetId);
                 packetInfo.setSrc(protocol.getIpv4().source());
                 packetInfo.setDst(protocol.getIpv4().destination());
                 // packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMillis());

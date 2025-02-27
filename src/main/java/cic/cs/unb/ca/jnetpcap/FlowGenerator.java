@@ -6,9 +6,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static cic.cs.unb.ca.jnetpcap.Utils.LINE_SEP;
@@ -54,6 +57,8 @@ public class FlowGenerator {
     private HashMap<String, BasicFlow> currentFlows;
     private HashMap<Integer, BasicFlow> finishedFlows;
     private HashMap<String, ArrayList> IPAddresses;
+    private Map<String, Map<Integer, List<Long>>> flowPacketMap; // Added to store packet IDs by flow ID
+    private boolean savePacketInfo = false; // Added to control saving packet information to JSON
 
     private boolean bidirectional;
     private long flowTimeOut;
@@ -68,15 +73,98 @@ public class FlowGenerator {
         init();
     }
 
+    // Add this constructor to enable saving packet information
+    public FlowGenerator(boolean bidirectional, long flowTimeout, long activityTimeout, boolean savePacketInfo) {
+        super();
+        this.bidirectional = bidirectional;
+        this.flowTimeOut = flowTimeout;
+        this.flowActivityTimeOut = activityTimeout;
+        this.savePacketInfo = savePacketInfo;
+        init();
+    }
+
     private void init() {
         currentFlows = new HashMap<>();
         finishedFlows = new HashMap<>();
         IPAddresses = new HashMap<>();
+        flowPacketMap = new HashMap<>();
         finishedFlowCount = 0;
     }
 
     public void addFlowListener(FlowGenListener listener) {
         mListener = listener;
+    }
+
+    // Method to save flow packet information to a JSON file
+    public void saveFlowPacketsToJson(BasicFlow flow, String outputPath) {
+        if (!savePacketInfo) {
+            return;
+        }
+
+        String flowId = flow.getFlowId();
+        if (flowId == null) {
+            logger.error("Flow ID is null, cannot save packet information");
+            return;
+        }
+
+        List<Long> packetIds = flow.getPacketSerialNumbers();
+        if (packetIds == null || packetIds.isEmpty()) {
+            logger.debug("No packet IDs to save for flow: {}", flowId);
+            return;
+        }
+
+        // Ensure outputPath ends with a file separator
+        if (!outputPath.endsWith(File.separator)) {
+            outputPath += File.separator;
+        }
+
+        // Create directory if it doesn't exist
+        File directory = new File(outputPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+            logger.debug("Created directory: {}", outputPath);
+        }
+
+        // Store in map
+        if (!flowPacketMap.containsKey(flowId)) {
+            flowPacketMap.put(flowId, new HashMap<>());
+        }
+
+        int flowIndex = flowPacketMap.get(flowId).size() + 1;
+        flowPacketMap.get(flowId).put(flowIndex, packetIds);
+
+        // Create the JSON file
+        String jsonFilePath = outputPath + flowId + ".json";
+
+        try (FileWriter file = new FileWriter(jsonFilePath)) {
+            StringBuilder json = new StringBuilder("{\n");
+            boolean firstFlow = true;
+
+            for (Map.Entry<Integer, List<Long>> entry : flowPacketMap.get(flowId).entrySet()) {
+                if (!firstFlow) {
+                    json.append(",\n");
+                }
+                firstFlow = false;
+
+                json.append("    \"").append(entry.getKey()).append("\": [");
+
+                List<Long> ids = entry.getValue();
+                for (int i = 0; i < ids.size(); i++) {
+                    if (i > 0) {
+                        json.append(", ");
+                    }
+                    json.append(ids.get(i));
+                }
+
+                json.append("]");
+            }
+
+            json.append("\n}");
+            file.write(json.toString());
+
+        } catch (IOException e) {
+            logger.error("Error writing JSON file: {}", e.getMessage());
+        }
     }
 
     public void addPacket(BasicPacketInfo packet) {
@@ -241,12 +329,28 @@ public class FlowGenerator {
                 }
             }
 
+            // Get the output directory from the file path
+            String outputPath = file.getParent();
+            if (outputPath == null) {
+                outputPath = ".";
+            }
+            if (!outputPath.endsWith(File.separator)) {
+                outputPath += File.separator;
+            }
+
+            // Process current flows
             for (BasicFlow flow : currentFlows.values()) {
                 if (flow.packetCount() > 1) {
                     output.write((flow.dumpFlowBasedFeaturesEx() + LINE_SEP).getBytes());
                     total++;
-                } else {
 
+                    // Save packet information for current flows if enabled
+                    if (savePacketInfo) {
+                        logger.info("Saving packet info for current flow: {}", flow.getFlowId());
+                        saveFlowPacketsToJson(flow, outputPath);
+                    }
+                } else {
+                    // Nothing to do for flows with only one packet
                 }
             }
 

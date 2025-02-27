@@ -24,6 +24,7 @@ public class CICFlowMeter {
 
         boolean readIP6 = false;
         boolean readIP4 = true;
+        boolean savePacketInfo = false; // Default is to not save packet info
 
         int totalFlows = 0;
 
@@ -45,6 +46,14 @@ public class CICFlowMeter {
             outpath = args[1];
         }
 
+        /* Check for save-packet-info option */
+        for (int i = 2; i < args.length; i++) {
+            if (args[i].equalsIgnoreCase("--save-packet-info")) {
+                savePacketInfo = true;
+                logger.info("Saving packet information to JSON files is enabled");
+            }
+        }
+
         // String[] files = new File(pcapPath).list();
 
         String[] pcapfiles = new File(pcapPath).list(new FilenameFilter() {
@@ -64,7 +73,7 @@ public class CICFlowMeter {
         logger.info("CICFlowMeterV2 found: {} Files.", pcapfiles.length);
 
         for (String file : pcapfiles) {
-            flowGen = new FlowGenerator(true, 120000000L, 5000000L);
+            flowGen = new FlowGenerator(true, 120000000L, 5000000L, savePacketInfo);
             packetReader = new PacketReader(pcapPath + file, readIP4, readIP6);
             logger.info("");
             logger.info("");
